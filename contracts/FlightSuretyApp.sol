@@ -340,4 +340,10 @@ contract FlightSuretyApp {
 
 contract FlightSuretyData {
     function isOperational() public view returns(bool);
+    function registerAirline() external returns(bool);
+    function buy(bytes32 key,address buyer, bool withInsurance) external payable;
+    function creditInsurees(address _address) external returns (uint256);
+    function pay(address _address) external;
+    function fund(bytes32 key , address _address) public;
+    function getFlightKey(bytes32 key) external returns(bool exist,uint256 status,bool registered,uint256 departuretime,uint256 price);
 }
