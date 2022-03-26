@@ -92,12 +92,11 @@ contract FlightSuretyApp {
      * @dev Add an airline to the registration queue
      *
      */
-    function registerAirline()
-        external
-        pure
-        returns (bool success, uint256 votes)
+    function registerAirline(address airlineAddress)
+        public
+        requireIsOperational
     {
-        return (success, 0);
+        dataContract.registerAirline(airlineAddress);
     }
 
     /**
