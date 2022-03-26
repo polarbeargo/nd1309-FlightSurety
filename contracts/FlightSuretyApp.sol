@@ -11,11 +11,11 @@ import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 /************************************************** */
 contract FlightSuretyApp {
     using SafeMath for uint256; // Allow SafeMath functions to be called for all uint256 types (similar to "prototype" in Javascript)
-
+    FlightSuretyData flightSuretyData;
     /********************************************************************************************/
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
-    FlightSuretyData flightSuretyData;
+
     // Flight status codees
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
     uint8 private constant STATUS_CODE_ON_TIME = 10;
@@ -47,7 +47,7 @@ contract FlightSuretyApp {
      *      the event there is an issue that needs to be fixed
      */
     modifier requireIsOperational() {
-        // Modify to call data contract's status
+        // Call data contract's status
         require(
             flightSuretyData.isOperational(),
             "Contract is currently not operational"
@@ -81,7 +81,7 @@ contract FlightSuretyApp {
     /********************************************************************************************/
 
     function isOperational() public pure returns (bool) {
-        return true; // Modify to call data contract's status
+        flightSuretyData.isOperational(); // Call data contract's status
     }
 
     /********************************************************************************************/
@@ -96,7 +96,7 @@ contract FlightSuretyApp {
         public
         requireIsOperational
     {
-        dataContract.registerAirline(airlineAddress);
+        flightSuretyData.registerAirline(airlineAddress);
     }
 
     /**
