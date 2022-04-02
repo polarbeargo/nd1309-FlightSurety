@@ -103,7 +103,19 @@ contract FlightSuretyApp {
      * @dev Register a future flight for insuring.
      *
      */
-    function registerFlight() external pure {}
+    function registerFlight(string calldata flight, uint8 status)
+        public
+        requireIsOperational
+    {
+        bytes32 key = keccak256(abi.encodePacked(flight, msg.sender));
+        require(!flights[key].isRegistered, "Flight already registered.");
+        flights[key] = Flight({
+            isRegistered: true,
+            statusCode: STATUS_CODE_UNKNOWN,
+            updatedTimestamp: timestamp,
+            airline: msg.sender
+        });
+    }
 
     /**
      * @dev Called after oracle has updated flight status
