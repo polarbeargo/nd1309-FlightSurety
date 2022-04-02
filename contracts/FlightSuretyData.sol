@@ -11,7 +11,10 @@ contract FlightSuretyData {
 
     address private contractOwner; // Account used to deploy contract
     bool private operational = true; // Blocks all state changes throughout the contract if false
-    mapping(address => uint256) authorizedContracts;
+    mapping(address => uint256) private authorizedContracts;
+    struct Airline {
+        ;
+    }
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -23,6 +26,7 @@ contract FlightSuretyData {
      */
     constructor() public {
         contractOwner = msg.sender;
+        airlines[contractOwner] = Airline(contractOwner);
     }
 
     /********************************************************************************************/
@@ -103,7 +107,11 @@ contract FlightSuretyData {
      *      Can only be called from FlightSuretyApp contract
      *
      */
-    function registerAirline() external pure {}
+    function registerAirline(address airlineAddress)
+        external
+        requireIsOperational
+        isCallerAuthorized
+    {}
 
     /**
      * @dev Buy insurance for a flight
