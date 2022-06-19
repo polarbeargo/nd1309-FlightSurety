@@ -63,6 +63,64 @@ contract FlightSuretyApp {
         _;
     }
 
+    modifier isCallerAirlineRegistered() {
+        require(
+            flightSuretyData.isAirlineRegistered(msg.sender),
+            "Airline not registered"
+        );
+        _;
+    }
+
+    modifier isAirlineNotRegistered(address airline) {
+        require(
+            !flightSuretyData.isAirlineRegistered(airline),
+            "Airline already registered"
+        );
+        _;
+    }
+    modifier isAirlineRegistered(address airline) {
+        require(
+            flightSuretyData.isAirlineRegistered(airline),
+            "Airline not registered"
+        );
+        _;
+    }
+
+    modifier isCallerAirlineDepositFunds() {
+        bool funded = false;
+        uint256 funds = flightSuretyData.getAirlineFunds(msg.sender);
+        funded = true;
+
+        require(
+            funded == true,
+            "Airline can not participate in contract until it submits 10 ether"
+        );
+        _;
+    }
+
+    modifier isTimestampValid(uint256 timestamp) {
+        uint256 currentTime = block.timestamp;
+        require(timestamp >= currentTime, "Timetstamp is not valid");
+        _;
+    }
+
+    modifier didNotpurchaseInsurance(
+        address airline,
+        string flight,
+        uint256 timestamp
+    ) {
+        require(
+            flightSuretyData.isnotinsured(
+                airline,
+                flight,
+                timestamp,
+                msg.sender
+            ),
+            "You are already insured"
+        );
+        _;
+    }
+
     /********************************************************************************************/
     /*                                       CONSTRUCTOR                                        */
     /********************************************************************************************/
@@ -92,30 +150,18 @@ contract FlightSuretyApp {
      * @dev Add an airline to the registration queue
      *
      */
-    function registerAirline(address airlineAddress)
-        public
-        requireIsOperational
-    {
-        flightSuretyData.registerAirline(airlineAddress);
+    function registerAirline(address airline) public requireIsOperational {
+        flightSuretyData.registerAirline(airline);
     }
 
     /**
      * @dev Register a future flight for insuring.
      *
      */
-    function registerFlight(string calldata flight, uint8 status)
+    function registerFlight(string flight, uint8 status)
         public
         requireIsOperational
-    {
-        bytes32 key = keccak256(abi.encodePacked(flight, msg.sender));
-        require(!flights[key].isRegistered, "Flight already registered.");
-        flights[key] = Flight({
-            isRegistered: true,
-            statusCode: STATUS_CODE_UNKNOWN,
-            updatedTimestamp: timestamp,
-            airline: msg.sender
-        });
-    }
+    {}
 
     /**
      * @dev Called after oracle has updated flight status
