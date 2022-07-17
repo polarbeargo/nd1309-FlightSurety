@@ -14,7 +14,7 @@ contract FlightSuretyData {
     address[] airlines;
     mapping(address => uint256) private authorizedContracts;
     mapping(address => bool) private registeredAirlines;
-
+    
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
@@ -97,9 +97,12 @@ contract FlightSuretyData {
         operational = mode;
     }
 
-    function isAirlineRegistered(address airline) public view returns (bool) {
+    function isAirlineRegistered(address airline) external view returns (bool) {
+        require(airline != address(0), "'airline' must be a valid address.");
         return registeredAirlines[airline];
     }
+
+    /**
 
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
@@ -140,7 +143,6 @@ contract FlightSuretyData {
         isCallerAirlineRegistered(airline)
     {
         bytes32 flightkey = getFlightKey(airline, flight, timestamp);
-        
     }
 
     /**
@@ -160,7 +162,6 @@ contract FlightSuretyData {
         uint256 payout
     ) external requireIsOperational isCallerAuthorized {
         bytes32 flightkey = getFlightKey(airline, flight, ts);
-        
     }
 
     /**

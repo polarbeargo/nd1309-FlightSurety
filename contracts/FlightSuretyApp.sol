@@ -65,7 +65,7 @@ contract FlightSuretyApp {
 
     modifier isCallerAirlineRegistered() {
         require(
-            flightSuretyData.isAirlineRegistered(msg.sender),
+            flightSuretyData.isAirlineRegistered(msg.sender == contractOwner),
             "Airline not registered"
         );
         _;
