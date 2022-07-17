@@ -34,6 +34,10 @@ contract FlightSuretyApp {
     }
     mapping(bytes32 => Flight) private flights;
 
+    constructor() public {
+        contractOwner = msg.sender;
+    }
+
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
     /********************************************************************************************/
@@ -362,7 +366,7 @@ contract FlightSuretyApp {
 
 contract FlightSuretyData {
     function isOperational() public view returns (bool);
-
+    function isAirlineRegistered(address airline) external view returns (bool);
     function registerAirline() external returns (bool);
 
     function buy(
