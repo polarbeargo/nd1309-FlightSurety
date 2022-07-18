@@ -69,7 +69,7 @@ contract FlightSuretyApp {
 
     modifier isCallerAirlineRegistered() {
         require(
-            flightSuretyData.isAirlineRegistered(msg.sender == contractOwner),
+            flightSuretyData.isAirlineRegistered(msg.sender),
             "Airline not registered"
         );
         _;
@@ -91,12 +91,10 @@ contract FlightSuretyApp {
     }
 
     modifier isCallerAirlineDepositFunds() {
-        bool funded = false;
-        uint256 funds = flightSuretyData.getAirlineFunds(msg.sender);
-        funded = true;
+        bool funds = flightSuretyData.getAirlineFunds(msg.sender);
 
         require(
-            funded == true,
+            funds == true,
             "Airline can not participate in contract until it submits 10 ether"
         );
         _;
@@ -366,7 +364,11 @@ contract FlightSuretyApp {
 
 contract FlightSuretyData {
     function isOperational() public view returns (bool);
+
     function isAirlineRegistered(address airline) external view returns (bool);
+
+    function getAirlineFunds(address airline) public view returns (bool);
+
     function registerAirline() external returns (bool);
 
     function buy(

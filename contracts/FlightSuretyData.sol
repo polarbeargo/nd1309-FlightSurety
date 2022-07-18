@@ -14,7 +14,7 @@ contract FlightSuretyData {
     address[] airlines;
     mapping(address => uint256) private authorizedContracts;
     mapping(address => bool) private registeredAirlines;
-    
+
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
@@ -99,6 +99,10 @@ contract FlightSuretyData {
 
     function isAirlineRegistered(address airline) external view returns (bool) {
         require(airline != address(0), "'airline' must be a valid address.");
+        return registeredAirlines[airline];
+    }
+
+    function getAirlineFunds(address airline) public view returns (bool) {
         return registeredAirlines[airline];
     }
 
