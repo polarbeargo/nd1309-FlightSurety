@@ -34,10 +34,6 @@ contract FlightSuretyApp {
     }
     mapping(bytes32 => Flight) private flights;
 
-    constructor() public {
-        contractOwner = msg.sender;
-    }
-
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
     /********************************************************************************************/
@@ -175,6 +171,10 @@ contract FlightSuretyApp {
         uint256 timestamp,
         uint8 statusCode
     ) internal pure {}
+
+    function withdraw() external requireIsOperational {
+        flightSuretyData.pay(msg.sender);
+    }
 
     // Generate a request for oracles to fetch flight information
     function fetchFlightStatus(
