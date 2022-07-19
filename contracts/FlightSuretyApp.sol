@@ -170,7 +170,15 @@ contract FlightSuretyApp {
         string memory flight,
         uint256 timestamp,
         uint8 statusCode
-    ) internal pure {}
+    ) internal {
+        bytes32 flightKey = getFlightKey(airline, flight, timestamp);
+        flights[flightKey].statusCode = statusCode;
+        if (statusCode == STATUS_CODE_LATE_AIRLINE) {
+            flightSuretyData.creditInsurees(flightKey, 160);
+        } else {
+            flightSuretyData.creditInsurees(flightKey, 0);
+        }
+    }
 
     function withdraw() external requireIsOperational {
         flightSuretyData.pay(msg.sender);
