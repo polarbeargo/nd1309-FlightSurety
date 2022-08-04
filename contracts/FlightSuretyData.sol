@@ -163,7 +163,7 @@ contract FlightSuretyData {
      *  @dev Credits payouts to insurees
      */
     function creditInsurees(bytes32 flightKey, uint8 rate)
-        public
+        public 
         view
         returns (uint256 value)
     {}
