@@ -102,23 +102,6 @@ contract FlightSuretyApp {
         _;
     }
 
-    modifier didNotpurchaseInsurance(
-        address airline,
-        string flight,
-        uint256 timestamp
-    ) {
-        require(
-            flightSuretyData.isnotinsured(
-                airline,
-                flight,
-                timestamp,
-                msg.sender
-            ),
-            "You are already insured"
-        );
-        _;
-    }
-
     /********************************************************************************************/
     /*                                       CONSTRUCTOR                                        */
     /********************************************************************************************/
@@ -136,7 +119,7 @@ contract FlightSuretyApp {
     /*                                       UTILITY FUNCTIONS                                  */
     /********************************************************************************************/
 
-    function isOperational() public pure returns (bool) {
+    function isOperational() public view returns (bool) {
         flightSuretyData.isOperational(); // Call data contract's status
     }
 
@@ -377,15 +360,18 @@ contract FlightSuretyData {
 
     function getAirlineFunds(address airline) public view returns (bool);
 
-    function registerAirline() external returns (bool);
+    function registerAirline(address airline) external returns (bool);
+
+    function creditInsurees(bytes32 flightKey, uint8 rate)
+        public
+        view
+        returns (uint256 value);
 
     function buy(
         bytes32 key,
         address buyer,
         bool withInsurance
     ) external payable;
-
-    function creditInsurees(address _address) external returns (uint256);
 
     function pay(address _address) external;
 

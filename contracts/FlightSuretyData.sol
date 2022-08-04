@@ -14,6 +14,16 @@ contract FlightSuretyData {
     address[] airlines;
     mapping(address => uint256) private authorizedContracts;
     mapping(address => bool) private registeredAirlines;
+    struct Insurance {
+        address passenger;
+        uint256 amount;
+        bool isCredited;
+    }
+
+    enum InsuranceState {
+        Bought,
+        Expired
+    }
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -152,7 +162,11 @@ contract FlightSuretyData {
     /**
      *  @dev Credits payouts to insurees
      */
-    function creditInsurees() external pure {}
+    function creditInsurees(bytes32 flightKey, uint8 rate)
+        public
+        view
+        returns (uint256 value)
+    {}
 
     /**
      *  @dev Transfers eligible payout funds to insuree
