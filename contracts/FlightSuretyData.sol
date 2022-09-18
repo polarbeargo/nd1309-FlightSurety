@@ -107,7 +107,7 @@ contract FlightSuretyData {
         operational = mode;
     }
 
-    function isAirlineRegistered(address airline) external view returns (bool) {
+    function isAirline(address airline) external view returns (bool) {
         require(airline != address(0), "'airline' must be a valid address.");
         return registeredAirlines[airline];
     }
