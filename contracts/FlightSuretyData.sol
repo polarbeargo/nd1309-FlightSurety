@@ -127,6 +127,14 @@ contract FlightSuretyData {
      *      Can only be called from FlightSuretyApp contract
      *
      */
+
+    function authorizeCaller(address contractAddress)
+        external
+        requireContractOwner
+    {
+        authorizedContracts[contractAddress] = 1;
+    }
+
     function registerAirline(address airline)
         external
         requireIsOperational
@@ -155,15 +163,13 @@ contract FlightSuretyData {
         requireIsOperational
         isCallerAuthorized
         isCallerAirlineRegistered(airline)
-    {
-        bytes32 flightkey = getFlightKey(airline, flight, timestamp);
-    }
+    {}
 
     /**
      *  @dev Credits payouts to insurees
      */
     function creditInsurees(bytes32 flightKey, uint8 rate)
-        public 
+        public
         view
         returns (uint256 value)
     {}
