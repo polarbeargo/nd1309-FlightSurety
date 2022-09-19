@@ -90,8 +90,16 @@ contract('Flight Surety Tests', async (accounts) => {
 
   });
 
-  it("can provide airline funding ", async () => {
-   
+  it("(airline) Can't participate in contract until it submits funding of 10 ether", async () => {
+    let error;
+    const fee = web3.utils.toWei('9', "ether");
+    try {
+        await config.flightSuretyData.fundAirline(config.owner, { from: config.owner, value: fee });
+    } catch (e) {
+        error = e;
+    }
+    let result = await config.flightSuretyData.getAirlineFunds.call(config.owner);
+    assert.equal(result, false, "Can't participate in contract until it submits funding of 10 ether");
   });
   
   it("(insurance) can't buy before flight registered", async () => {

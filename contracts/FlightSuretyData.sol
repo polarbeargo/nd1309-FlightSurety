@@ -14,6 +14,8 @@ contract FlightSuretyData {
     address[] airlines;
     mapping(address => uint256) private authorizedContracts;
     mapping(address => bool) private registeredAirlines;
+    mapping (address => uint) private fundedAirlines;
+    
     struct Insurance {
         address passenger;
         uint256 amount;
@@ -223,5 +225,14 @@ contract FlightSuretyData {
         requireContractOwner
     {
         delete authorizedContracts[dataContract];
+    }
+
+    function fundAirline(address airline, uint256 amount)
+        external
+        requireIsOperational
+        isCallerAuthorized
+        isCallerAirlineRegistered(airline)
+    {
+        fundedAirlines[airline] += amount;
     }
 }
