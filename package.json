@@ -46,6 +46,7 @@
     "webpack-node-externals": "1.7.2"
   },
   "dependencies": {
+    "@babel/runtime": "^7.18.9",
     "@truffle/hdwallet-provider": "^2.0.8",
     "compile": "0.0.2"
   }
