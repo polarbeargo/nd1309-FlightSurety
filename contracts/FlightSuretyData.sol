@@ -14,8 +14,8 @@ contract FlightSuretyData {
     address[] airlines;
     mapping(address => uint256) private authorizedContracts;
     mapping(address => bool) private registeredAirlines;
-    mapping (address => uint) private fundedAirlines;
-    
+    mapping(address => uint256) private fundedAirlines;
+
     struct Insurance {
         address passenger;
         uint256 amount;
@@ -30,7 +30,7 @@ contract FlightSuretyData {
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
-
+    event InsuranceBought(address airlineAddress, string flightName, uint256 timestamp, address passenger, uint256 amount, uint256 refund);
     /**
      * @dev Constructor
      *      The deploying account becomes contractOwner
@@ -155,17 +155,16 @@ contract FlightSuretyData {
      *
      */
     function buy(
-        address airline,
-        string flight,
+        address airlineAddress,
+        string flightName,
         uint256 timestamp,
         address passenger,
-        uint256 amount
-    )
-        external
-        requireIsOperational
-        isCallerAuthorized
-        isCallerAirlineRegistered(airline)
-    {}
+        uint256 amount,
+        uint256 refund
+    ) external requireIsOperational isCallerAuthorized {
+        bytes32 flightKey = getFlightKey(airlineAddress, flightName, timestamp);
+        emit InsuranceBought(airlineAddress, flightName, timestamp, passenger, amount, refund);
+    }
 
     /**
      *  @dev Credits payouts to insurees

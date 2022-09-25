@@ -25,14 +25,19 @@ contract FlightSuretyApp {
     uint8 private constant STATUS_CODE_LATE_OTHER = 50;
 
     address private contractOwner; // Account used to deploy contract
-
+    uint256 private constant MAX_INSURANCE_FEE = 1 ether;
+    uint256 private constant INSURANCE_REFUND = 150;
     struct Flight {
         bool isRegistered;
         uint8 statusCode;
-        uint256 updatedTimestamp;
+        uint256 timestamp;
         address airline;
+        string flightName;
+        bool isInsured;
     }
     mapping(bytes32 => Flight) private flights;
+    bytes32[] flightsList;
+    uint256 public flightsCount;
 
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
@@ -126,7 +131,6 @@ contract FlightSuretyApp {
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
-
     /**
      * @dev Add an airline to the registration queue
      *
@@ -150,7 +154,7 @@ contract FlightSuretyApp {
      */
     function processFlightStatus(
         address airline,
-        string memory flight,
+        string flight,
         uint256 timestamp,
         uint8 statusCode
     ) internal {
@@ -165,6 +169,30 @@ contract FlightSuretyApp {
 
     function withdraw() external requireIsOperational {
         flightSuretyData.pay(msg.sender);
+    }
+
+    function buy(
+        address airline,
+        string flight,
+        uint256 timestamp
+    ) external payable requireIsOperational {
+        require(
+            flightSuretyData.isAirlineRegistered(airline),
+            "Airline is not registered"
+        );
+        require(
+            msg.value <= MAX_INSURANCE_FEE,
+            "Insuranced fee must be 1 ether or less"
+        );
+
+        flightSuretyData.buy(
+            airline,
+            flight,
+            timestamp,
+            msg.sender,
+            msg.value,
+            INSURANCE_REFUND
+        );
     }
 
     // Generate a request for oracles to fetch flight information
@@ -368,9 +396,12 @@ contract FlightSuretyData {
         returns (uint256 value);
 
     function buy(
-        bytes32 key,
-        address buyer,
-        bool withInsurance
+        address airlineAddress,
+        string flightName,
+        uint256 timestamp,
+        address passenger,
+        uint256 amount,
+        uint256 refund
     ) external payable;
 
     function pay(address _address) external;
