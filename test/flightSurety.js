@@ -102,16 +102,36 @@ contract('Flight Surety Tests', async (accounts) => {
     assert.equal(result, false, "Can't participate in contract until it submits funding of 10 ether");
   });
   
-  it("(insurance) can't buy before flight registered", async () => {
-    
+  it("(Passengers) Passengers may pay up to 1 ether for purchasing flight insurance.", async () => {
+    const fee = web3.utils.toWei('0.5', "ether");
+    const flightName = "2nd air";
+    const secondAirline = config.testAddresses[0];
+    const timeStamp = 1520032867;
+    const passengerAddress = config.testAddresses[2];
+    let error = false;
+    try {
+          await config.flightSuretyApp.buy(secondAirline, flightName, timeStamp, { from: passengerAddress, value: fee });
+    }
+    catch (e) {
+      error = true;
+    }
+    assert.equal(error, false, "Passenger can't buy an insurance less than 1 ether.")
   });
 
   it("(insurance) can't buy insurance for airlines that are not funded", async () => {
-    // try to buy insurance for airline which is not funded enough
+    let reverted = false;
+    const flightName = "2nd air";
+    const secondAirline = config.testAddresses[0];
+    const timeStamp = 1520032867;
+      try {
+        await config.flightSuretyApp.buyInsurance(secondAirline, flightName, timeStamp, {from: passenger1, value: 0, gasPrice: 0});
+      }
+      catch(e) {
+        reverted = true;
+      }
+
+      assert.equal(reverted, true, "No funds provided");
     
-    // ACT
-    
-  
 });
  
 
