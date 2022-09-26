@@ -74,16 +74,16 @@ contract('Flight Surety Tests', async (accounts) => {
   it('(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
     
     // ARRANGE
-    let newAirline = accounts[2];
-
+    
+    let error;
     // ACT
     try {
-        await config.flightSuretyData.registerAirline(newAirline, {from: config.firstAirline});
+        await config.flightSuretyData.registerAirline("ND1309", {from: config.firstAirline});
     }
     catch(e) {
-
+      error = e;
     }
-    let result = await config.flightSuretyData.isAirline.call(newAirline); 
+    let result = await config.flightSuretyData.isAirlineRegistered.call(config.firstAirline); 
 
     // ASSERT
     assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
@@ -100,6 +100,24 @@ contract('Flight Surety Tests', async (accounts) => {
     }
     let result = await config.flightSuretyData.getAirlineFunds.call(config.owner);
     assert.equal(result, false, "Can't participate in contract until it submits funding of 10 ether");
+  });
+
+  it("(airline) Only existing airline may register a new airline until there are at least four airlines registered", async () => {
+    try{
+      
+      await config.flightSuretyApp.registerAirline(accounts[2], { from: config.testAddresses[2] });
+      await config.flightSuretyApp.registerAirline(accounts[3], { from: config.testAddresses[3] });
+      await config.flightSuretyApp.registerAirline(accounts[4], { from: config.testAddresses[4] });
+    }
+    catch (e) {
+      console.log(e);
+    }
+    let result2 = await config.flightSuretyData.isAirlineRegistered.call(config.testAddresses[2]);
+    let result3 = await config.flightSuretyData.isAirlineRegistered.call(config.testAddresses[3]);
+    let result4 = await config.flightSuretyData.isAirlineRegistered.call(config.testAddresses[4]);
+    assert.equal(result2, true, "2nd airline registered succesfully.");
+    assert.equal(result3, true, "3rd airline registered succesfully.");
+    assert.equal(result4, false, "4th airline should not registered and require registration consensus.");
   });
   
   it("(Passengers) Passengers may pay up to 1 ether for purchasing flight insurance.", async () => {
