@@ -12,6 +12,7 @@ contract FlightSuretyData {
     address private contractOwner; // Account used to deploy contract
     bool private operational = true; // Blocks all state changes throughout the contract if false
     address[] airlines;
+    uint256 airlineCounter = 0;
     mapping(address => uint256) private authorizedContracts;
     mapping(address => bool) private registeredAirlines;
     mapping(address => uint256) private fundedAirlines;
@@ -30,7 +31,15 @@ contract FlightSuretyData {
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
-    event InsuranceBought(address airlineAddress, string flightName, uint256 timestamp, address passenger, uint256 amount, uint256 refund);
+    event InsuranceBought(
+        address airlineAddress,
+        string flightName,
+        uint256 timestamp,
+        address passenger,
+        uint256 amount,
+        uint256 refund
+    );
+
     /**
      * @dev Constructor
      *      The deploying account becomes contractOwner
@@ -109,7 +118,7 @@ contract FlightSuretyData {
         operational = mode;
     }
 
-    function isAirline(address airline) external view returns (bool) {
+    function isAirlineRegistered(address airline) external view returns (bool) {
         require(airline != address(0), "'airline' must be a valid address.");
         return registeredAirlines[airline];
     }
@@ -147,7 +156,12 @@ contract FlightSuretyData {
         require(airline != address(0));
         airlines.push(airline);
         registeredAirlines[airline] = true;
+        airlineCounter = airlineCounter.add(1);
         return registeredAirlines[airline];
+    }
+
+    function counter() external view returns (uint256) {
+        return airlineCounter;
     }
 
     /**
@@ -163,7 +177,14 @@ contract FlightSuretyData {
         uint256 refund
     ) external requireIsOperational isCallerAuthorized {
         bytes32 flightKey = getFlightKey(airlineAddress, flightName, timestamp);
-        emit InsuranceBought(airlineAddress, flightName, timestamp, passenger, amount, refund);
+        emit InsuranceBought(
+            airlineAddress,
+            flightName,
+            timestamp,
+            passenger,
+            amount,
+            refund
+        );
     }
 
     /**

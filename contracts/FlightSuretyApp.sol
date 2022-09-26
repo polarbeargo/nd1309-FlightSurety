@@ -136,7 +136,9 @@ contract FlightSuretyApp {
      *
      */
     function registerAirline(address airline) public requireIsOperational {
-        flightSuretyData.registerAirline(airline);
+        if (flightSuretyData.counter() < 4) {
+            flightSuretyData.registerAirline(airline);
+        }
     }
 
     /**
@@ -389,6 +391,8 @@ contract FlightSuretyData {
     function getAirlineFunds(address airline) public view returns (bool);
 
     function registerAirline(address airline) external returns (bool);
+
+    function counter() external view returns (uint256);
 
     function creditInsurees(bytes32 flightKey, uint8 rate)
         public
