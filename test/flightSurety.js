@@ -103,21 +103,19 @@ contract('Flight Surety Tests', async (accounts) => {
   });
 
   it("(airline) Only existing airline may register a new airline until there are at least four airlines registered", async () => {
-    try{
+    
+    for (let i = 2; i < 5; i++) {
+      await config.flightSuretyApp.registerAirline(accounts[i], { from: config.testAddresses[i] });
+    } 
       
-      await config.flightSuretyApp.registerAirline(accounts[2], { from: config.testAddresses[2] });
-      await config.flightSuretyApp.registerAirline(accounts[3], { from: config.testAddresses[3] });
-      await config.flightSuretyApp.registerAirline(accounts[4], { from: config.testAddresses[4] });
+    for (let i = 2; i < 5; i++) {
+        let result = await config.flightSuretyData.isAirlineRegistered.call(config.testAddresses[i]);
+      if(i=4){
+        assert.equal(result, false, "4th airline should not registered and require registration consensus.");
+      }else {
+        assert.equal(result, true, "%d nd airline registered succesfully.",i);
+      }
     }
-    catch (e) {
-      console.log(e);
-    }
-    let result2 = await config.flightSuretyData.isAirlineRegistered.call(config.testAddresses[2]);
-    let result3 = await config.flightSuretyData.isAirlineRegistered.call(config.testAddresses[3]);
-    let result4 = await config.flightSuretyData.isAirlineRegistered.call(config.testAddresses[4]);
-    assert.equal(result2, true, "2nd airline registered succesfully.");
-    assert.equal(result3, true, "3rd airline registered succesfully.");
-    assert.equal(result4, false, "4th airline should not registered and require registration consensus.");
   });
   
   it("(Passengers) Passengers may pay up to 1 ether for purchasing flight insurance.", async () => {
