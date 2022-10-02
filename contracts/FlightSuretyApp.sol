@@ -202,7 +202,7 @@ contract FlightSuretyApp {
         address airline,
         string flight,
         uint256 timestamp
-    ) external {
+    ) external requireIsOperational isAirlineRegistered(airline) {
         uint8 index = getRandomIndex(msg.sender);
 
         // Generate a unique key for storing the request
@@ -274,14 +274,27 @@ contract FlightSuretyApp {
         uint256 timestamp
     );
 
+    event registeredOracle(
+        bool isRegistered,
+        address indexed _oracle,
+        uint256 registrationFee,
+        uint8[3] indexes
+    );
+
     // Register an oracle with the contract
-    function registerOracle() external payable {
+    function registerOracle() public payable requireIsOperational {
         // Require registration fee
         require(msg.value >= REGISTRATION_FEE, "Registration fee is required");
 
         uint8[3] memory indexes = generateIndexes(msg.sender);
 
         oracles[msg.sender] = Oracle({isRegistered: true, indexes: indexes});
+        emit registeredOracle(
+            oracles[msg.sender].isRegistered,
+            msg.sender,
+            msg.value,
+            oracles[msg.sender].indexes
+        );
     }
 
     function getMyIndexes() external view returns (uint8[3]) {
