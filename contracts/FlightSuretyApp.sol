@@ -68,42 +68,11 @@ contract FlightSuretyApp {
         _;
     }
 
-    modifier isCallerAirlineRegistered() {
-        require(
-            flightSuretyData.isAirlineRegistered(msg.sender),
-            "Airline not registered"
-        );
-        _;
-    }
-
-    modifier isAirlineNotRegistered(address airline) {
-        require(
-            !flightSuretyData.isAirlineRegistered(airline),
-            "Airline already registered"
-        );
-        _;
-    }
     modifier isAirlineRegistered(address airline) {
         require(
             flightSuretyData.isAirlineRegistered(airline),
             "Airline not registered"
         );
-        _;
-    }
-
-    modifier isCallerAirlineDepositFunds() {
-        bool funds = flightSuretyData.getAirlineFunds(msg.sender);
-
-        require(
-            funds == true,
-            "Airline can not participate in contract until it submits 10 ether"
-        );
-        _;
-    }
-
-    modifier isTimestampValid(uint256 timestamp) {
-        uint256 currentTime = block.timestamp;
-        require(timestamp >= currentTime, "Timetstamp is not valid");
         _;
     }
 
@@ -145,10 +114,35 @@ contract FlightSuretyApp {
      * @dev Register a future flight for insuring.
      *
      */
-    function registerFlight(string flight, uint8 status)
-        public
-        requireIsOperational
-    {}
+
+    event RegisteredFlight(
+        address indexed airline,
+        bytes32 indexed key,
+        string flight,
+        uint256 timestamp,
+        uint8 status
+    );
+
+    function registerFlight(
+        address airline,
+        string memory _flight,
+        uint256 timestamp
+    ) public requireIsOperational {
+        bytes32 key = getFlightKey(airline, _flight, timestamp);
+        Flight storage flight = flights[key];
+        require(!flight.isRegistered, "Cannot register an existing flight");
+        flight.isRegistered = true;
+        flight.statusCode = 10;
+        flight.timestamp = timestamp;
+        flight.airline = airline;
+        emit RegisteredFlight(
+            airline,
+            key,
+            _flight,
+            timestamp,
+            10
+        );
+    }
 
     /**
      * @dev Called after oracle has updated flight status
@@ -202,7 +196,7 @@ contract FlightSuretyApp {
         address airline,
         string flight,
         uint256 timestamp
-    ) external requireIsOperational isAirlineRegistered(airline) {
+    ) external requireIsOperational {
         uint8 index = getRandomIndex(msg.sender);
 
         // Generate a unique key for storing the request
@@ -297,7 +291,7 @@ contract FlightSuretyApp {
         );
     }
 
-    function getMyIndexes() external view returns (uint8[3]) {
+    function getMyIndexes() public view returns (uint8[3] memory) {
         require(
             oracles[msg.sender].isRegistered,
             "Not registered as an oracle"
