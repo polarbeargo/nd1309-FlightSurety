@@ -129,7 +129,7 @@ contract('Flight Surety Tests', async (accounts) => {
     catch (e) {
       error = true;
     }
-    assert.equal(error, false, "Passenger can't buy an insurance less than 1 ether.")
+    assert.equal(error, true, "Passenger can't buy an insurance less than 1 ether.")
   });
 
   it("(insurance) can't buy insurance for airlines that are not funded", async () => {
